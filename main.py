@@ -10,14 +10,25 @@ class Ui_MainWindow(object):
         MainWindow.resize(398, 524)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.headerLabel = QtWidgets.QLabel(self.centralwidget)
-        self.headerLabel.setGeometry(QtCore.QRect(30, 10, 201, 31))
+        self.headerLabel.setGeometry(QtCore.QRect(20, 10, 201, 31))
         self.headerLabel.setObjectName("headerLabel")
+
         self.lblGetTable = QtWidgets.QLabel(self.centralwidget)
-        self.lblGetTable.setGeometry(QtCore.QRect(20, 70, 91, 16))
+        self.lblGetTable.setGeometry(QtCore.QRect(20, 70, 91, 25))
         self.lblGetTable.setObjectName("lblGetTable")
+
+        self.lblCurrentOption = QtWidgets.QLabel(self.centralwidget)
+        self.lblCurrentOption.setGeometry(QtCore.QRect(20, 105, 91, 25))
+        self.lblCurrentOption.setObjectName("lblCurrentOption")
+
+        self.lblNewOption = QtWidgets.QLabel(self.centralwidget)
+        self.lblNewOption.setGeometry(QtCore.QRect(20, 140, 91, 25))
+        self.lblNewOption.setObjectName("lblNewOption")
+
         self.cmbSelectTable = QtWidgets.QComboBox(self.centralwidget)
-        self.cmbSelectTable.setGeometry(QtCore.QRect(230, 70, 131, 26))
+        self.cmbSelectTable.setGeometry(QtCore.QRect(140, 70, 110, 25))
         self.cmbSelectTable.setObjectName("cmbSelectTable")
         self.cmbSelectTable.addItem("")
         self.cmbSelectTable.addItem("")
@@ -28,36 +39,34 @@ class Ui_MainWindow(object):
         self.cmbSelectTable.addItem("")
         self.cmbSelectTable.addItem("")
         self.cmbSelectTable.addItem("")
-        self.cmbSetTable = QtWidgets.QComboBox(self.centralwidget)
-        self.cmbSetTable.setGeometry(QtCore.QRect(240, 300, 131, 26))
-        self.cmbSetTable.setObjectName("cmbSetTable")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.cmbSetTable.addItem("")
-        self.lblUpdateTable = QtWidgets.QLabel(self.centralwidget)
-        self.lblUpdateTable.setGeometry(QtCore.QRect(30, 300, 171, 16))
-        self.lblUpdateTable.setObjectName("lblUpdateTable")
-        self.lblSetOption = QtWidgets.QLineEdit(self.centralwidget)
-        self.lblSetOption.setGeometry(QtCore.QRect(30, 330, 341, 21))
-        self.lblSetOption.setObjectName("lblSetOption")
+
         self.btnSubmit = QtWidgets.QPushButton(self.centralwidget)
-        self.btnSubmit.setGeometry(QtCore.QRect(140, 360, 113, 32))
+        self.btnSubmit.setGeometry(QtCore.QRect(50, 175, 130, 35))
         self.btnSubmit.setObjectName("btnSubmit")
+
+        self.btnClear = QtWidgets.QPushButton(self.centralwidget)
+        self.btnClear.setGeometry(QtCore.QRect(190, 175, 130, 35))
+        self.btnClear.setObjectName("btnClear")
+
         self.txtCurrentOption = QtWidgets.QLineEdit(self.centralwidget)
-        self.txtCurrentOption.setGeometry(QtCore.QRect(20, 100, 341, 21))
+        self.txtCurrentOption.setGeometry(QtCore.QRect(140, 105, 220, 25))
         self.txtCurrentOption.setReadOnly(True)
         self.txtCurrentOption.setObjectName("txtCurrentOption")
+
+        self.txtSetOption = QtWidgets.QLineEdit(self.centralwidget)
+        self.txtSetOption.setGeometry(QtCore.QRect(140, 140, 220, 25))
+        self.txtSetOption.setObjectName("txtSetOption")
+
+        self.txtTableList = QtWidgets.QTextBrowser(self.centralwidget)
+        self.txtTableList.setGeometry(QtCore.QRect(20, 220, 350, 300))
+        self.txtTableList.setObjectName("txtTableList")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 398, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -65,13 +74,19 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # actions
         self.cmbSelectTable.activated.connect(self.getTableInfo)
+        self.btnSubmit.clicked.connect(self.setTableInfo)
+        self.btnClear.clicked.connect(self.clearTableInfo)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.headerLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:24pt;\">Prov Table Updater</span></p></body></html>"))
+        MainWindow.setWindowTitle(_translate("Prov Option Updater 3000", "Prov Option Updater 3000"))
+        self.headerLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt;\">Prov Table Updater</span></p></body></html>"))
+        self.headerLabel.adjustSize()
         self.lblGetTable.setText(_translate("MainWindow", "Get Table Info"))
+        self.lblCurrentOption.setText(_translate("MainWindow", "Current Option"))
+        self.lblNewOption.setText(_translate("MainWindow", "New Option"))
         self.cmbSelectTable.setItemText(0, _translate("MainWindow", "Select a table"))
         self.cmbSelectTable.setItemText(1, _translate("MainWindow", "Table 1"))
         self.cmbSelectTable.setItemText(2, _translate("MainWindow", "Table 2"))
@@ -81,21 +96,15 @@ class Ui_MainWindow(object):
         self.cmbSelectTable.setItemText(6, _translate("MainWindow", "Table 6"))
         self.cmbSelectTable.setItemText(7, _translate("MainWindow", "Table 7"))
         self.cmbSelectTable.setItemText(8, _translate("MainWindow", "Table 8"))
-        self.cmbSetTable.setItemText(0, _translate("MainWindow", "Select a table"))
-        self.cmbSetTable.setItemText(1, _translate("MainWindow", "Table 1"))
-        self.cmbSetTable.setItemText(2, _translate("MainWindow", "Table 2"))
-        self.cmbSetTable.setItemText(3, _translate("MainWindow", "Table 3"))
-        self.cmbSetTable.setItemText(4, _translate("MainWindow", "Table 4"))
-        self.cmbSetTable.setItemText(5, _translate("MainWindow", "Table 5"))
-        self.cmbSetTable.setItemText(6, _translate("MainWindow", "Table 6"))
-        self.cmbSetTable.setItemText(7, _translate("MainWindow", "Table 7"))
-        self.cmbSetTable.setItemText(8, _translate("MainWindow", "Table 8"))
-        self.lblUpdateTable.setText(_translate("MainWindow", "Update Table DHCP Option"))
-        self.lblSetOption.setText(_translate("MainWindow", "Add an option"))
+        self.txtSetOption.setPlaceholderText("Set new option...")
+        self.txtTableList.setPlaceholderText("Waiting for API call...")
         self.btnSubmit.setText(_translate("MainWindow", "Send it!"))
-        self.txtCurrentOption.setText(_translate("MainWindow", "Select a table..."))
+        self.btnClear.setText(_translate("MainWindow", "Clear that shit"))
+        self.txtCurrentOption.setPlaceholderText(_translate("MainWindow", "Select a table..."))
 
+    
     def getTableInfo(self):
+        self.txtCurrentOption.setText("Getting table info...")
         print("Getting table info...")
         API_KEY = creds.creds['api_key']
         dashboard = meraki.DashboardAPI(
@@ -122,14 +131,88 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(f'some other error: {e}')
         else:
+            tables_string = ''
             for vlan in vlans:
-                if vlan['id'] == table_id and 'dhcpOptions' in vlan:
-                    print(f'VLAN: {vlan}')
+                vlan_id = vlan['id']
+                option_value = 'UNSET'
+                if 'dhcpOptions' in vlan:
                     for option in vlan['dhcpOptions']:
-                        dhcp_option = option['value']
+                        option_value = option['value']
+                        if vlan['id'] == table_id:
+                            dhcp_option = option['value']
+
+                if vlan_id in range(101,109):
+                    tables_string += f'Table {vlan_id}: {option_value}\n\n'
+
+        self.txtTableList.setText(tables_string)
         
         print(f'Current option: {dhcp_option}')
-        self.txtCurrentOption.setText(dhcp_option)
+        if dhcp_option != 'Select a table...':
+            self.txtCurrentOption.setText(dhcp_option)
+
+    def setTableInfo(self):
+        API_KEY = creds.creds['api_key']
+        dashboard = meraki.DashboardAPI(
+            api_key = API_KEY,
+            base_url = 'https://api-mp.meraki.com/api/v1/',
+            print_console = False,
+            output_log = False
+        )
+
+        network = 'L_613052499275810377'
+        selected_table = self.cmbSelectTable.currentText()
+        selected_table = '10' + selected_table[-1:]
+
+        table_id = int(selected_table)
+
+        optionToSet = self.txtSetOption.text()
+        print(f'Setting table {table_id} with option {optionToSet}')
+
+        try:
+            # Get list of clients on network, filtering on timespan of last 14 days
+            vlans = dashboard.appliance.getNetworkApplianceVlans(network)
+        except meraki.APIError as e:
+            print(f'Meraki API error: {e}')
+            print(f'status code = {e.status}')
+            print(f'reason = {e.reason}')
+            print(f'error = {e.message}')
+        except Exception as e:
+            print(f'some other error: {e}')
+        else:
+            for vlan in vlans:
+                if vlan['id'] == table_id:
+                    dhcp_option = []
+                    set_vlan = {
+                        "code": "66",
+                        "type": "text",
+                        "value": optionToSet
+                    }
+                    dhcp_option.append(set_vlan)
+                    print(dhcp_option)
+
+                    dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=dhcp_option)
+        
+        self.txtCurrentOption.setText(optionToSet)
+
+    
+    def clearTableInfo(self):
+        API_KEY = creds.creds['api_key']
+        dashboard = meraki.DashboardAPI(
+            api_key = API_KEY,
+            base_url = 'https://api-mp.meraki.com/api/v1/',
+            print_console = False,
+            output_log = False
+        )
+
+        network = 'L_613052499275810377'
+        selected_table = self.cmbSelectTable.currentText()
+        selected_table = '10' + selected_table[-1:]
+
+        table_id = int(selected_table)
+
+        dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=[])
+
+        self.txtCurrentOption.setText('UNSET')
         
 
 if __name__ == "__main__":
