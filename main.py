@@ -15,9 +15,9 @@ class Ui_MainWindow(object):
         self.headerLabel.setGeometry(QtCore.QRect(20, 10, 201, 31))
         self.headerLabel.setObjectName("headerLabel")
 
-        self.lblGetTable = QtWidgets.QLabel(self.centralwidget)
-        self.lblGetTable.setGeometry(QtCore.QRect(20, 70, 91, 25))
-        self.lblGetTable.setObjectName("lblGetTable")
+        self.lblSelectTable = QtWidgets.QLabel(self.centralwidget)
+        self.lblSelectTable.setGeometry(QtCore.QRect(20, 70, 91, 25))
+        self.lblSelectTable.setObjectName("lblSelectTable")
 
         self.lblCurrentOption = QtWidgets.QLabel(self.centralwidget)
         self.lblCurrentOption.setGeometry(QtCore.QRect(20, 105, 91, 25))
@@ -84,7 +84,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("Prov Option Updater 3000", "Prov Option Updater 3000"))
         self.headerLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:18pt;\">Prov Table Updater</span></p></body></html>"))
         self.headerLabel.adjustSize()
-        self.lblGetTable.setText(_translate("MainWindow", "Get Table Info"))
+        self.lblSelectTable.setText(_translate("MainWindow", "Select Table"))
         self.lblCurrentOption.setText(_translate("MainWindow", "Current Option"))
         self.lblNewOption.setText(_translate("MainWindow", "New Option"))
         self.cmbSelectTable.setItemText(0, _translate("MainWindow", "Select a table"))
@@ -96,6 +96,7 @@ class Ui_MainWindow(object):
         self.cmbSelectTable.setItemText(6, _translate("MainWindow", "Table 6"))
         self.cmbSelectTable.setItemText(7, _translate("MainWindow", "Table 7"))
         self.cmbSelectTable.setItemText(8, _translate("MainWindow", "Table 8"))
+        self.cmbSelectTable.adjustSize()
         self.txtSetOption.setPlaceholderText("Set new option...")
         self.txtTableList.setPlaceholderText("Waiting for API call...")
         self.btnSubmit.setText(_translate("MainWindow", "Send it!"))
@@ -164,6 +165,7 @@ class Ui_MainWindow(object):
         selected_table = '10' + selected_table[-1:]
 
         table_id = int(selected_table)
+        tables_string = ''
 
         optionToSet = self.txtSetOption.text()
         print(f'Setting table {table_id} with option {optionToSet}')
@@ -179,7 +181,18 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(f'some other error: {e}')
         else:
+            list_of_vlans = []
             for vlan in vlans:
+                # vlan_id = vlan['id']
+                option_value = 'UNSET'
+                if 'dhcpOptions' in vlan:
+                    for option in vlan['dhcpOptions']:
+                        option_value = option['value']
+                    vlan_dict = {
+                        "table_id": vlan['id'],
+                        "table_option": option_value
+                    }
+                    list_of_vlans.append(vlan_dict)
                 if vlan['id'] == table_id:
                     dhcp_option = []
                     set_vlan = {
@@ -187,12 +200,23 @@ class Ui_MainWindow(object):
                         "type": "text",
                         "value": optionToSet
                     }
+                    option_value = set_vlan['value']
                     dhcp_option.append(set_vlan)
                     print(dhcp_option)
 
                     dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=dhcp_option)
+
+            for vlan in list_of_vlans:
+                if vlan['table_id'] in range(101,109):
+                    table_option = vlan['table_option']
+                    vlan_id = vlan['table_id']
+                    if vlan_id == table_id:
+                        table_option = optionToSet
+                    tables_string += f'Table {vlan_id}: {table_option}\n\n'
         
         self.txtCurrentOption.setText(optionToSet)
+        self.txtTableList.setText(tables_string)
+        self.txtSetOption.setText('')
 
     
     def clearTableInfo(self):
@@ -209,10 +233,45 @@ class Ui_MainWindow(object):
         selected_table = '10' + selected_table[-1:]
 
         table_id = int(selected_table)
+        tables_string = ''
+
+        try:
+            # Get list of clients on network, filtering on timespan of last 14 days
+            vlans = dashboard.appliance.getNetworkApplianceVlans(network)
+        except meraki.APIError as e:
+            print(f'Meraki API error: {e}')
+            print(f'status code = {e.status}')
+            print(f'reason = {e.reason}')
+            print(f'error = {e.message}')
+        except Exception as e:
+            print(f'some other error: {e}')
+        else:
+            list_of_vlans = []
+            for vlan in vlans:
+                # vlan_id = vlan['id']
+                option_value = 'UNSET'
+                if 'dhcpOptions' in vlan:
+                    for option in vlan['dhcpOptions']:
+                        option_value = option['value']
+                    vlan_dict = {
+                        "table_id": vlan['id'],
+                        "table_option": option_value
+                    }
+                    list_of_vlans.append(vlan_dict)
+
+            for vlan in list_of_vlans:
+                if vlan['table_id'] in range(101,109):
+                    table_option = vlan['table_option']
+                    vlan_id = vlan['table_id']
+                    if vlan_id == table_id:
+                        table_option = 'UNSET'
+                    tables_string += f'Table {vlan_id}: {table_option}\n\n'
 
         dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=[])
 
         self.txtCurrentOption.setText('UNSET')
+        self.txtTableList.setText(tables_string)
+        self.txtSetOption.setText('')
         
 
 if __name__ == "__main__":
