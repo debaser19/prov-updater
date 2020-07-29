@@ -1,3 +1,4 @@
+import PyQt5
 from PyQt5 import QtCore, QtGui, QtWidgets
 import meraki
 import creds
@@ -117,39 +118,40 @@ class Ui_MainWindow(object):
 
         network = 'L_613052499275810377'
         selected_table = self.cmbSelectTable.currentText()
-        selected_table = '10' + selected_table[-1:]
-
-        table_id = int(selected_table)
-        dhcp_option = 'UNSET'
-        try:
-            # Get list of clients on network, filtering on timespan of last 14 days
-            vlans = dashboard.appliance.getNetworkApplianceVlans(network)
-        except meraki.APIError as e:
-            print(f'Meraki API error: {e}')
-            print(f'status code = {e.status}')
-            print(f'reason = {e.reason}')
-            print(f'error = {e.message}')
-        except Exception as e:
-            print(f'some other error: {e}')
-        else:
-            tables_string = ''
-            for vlan in vlans:
-                vlan_id = vlan['id']
-                option_value = 'UNSET'
-                if 'dhcpOptions' in vlan:
-                    for option in vlan['dhcpOptions']:
-                        option_value = option['value']
-                        if vlan['id'] == table_id:
-                            dhcp_option = option['value']
-
-                if vlan_id in range(101,109):
-                    tables_string += f'Table {vlan_id}: {option_value}\n\n'
-
-        self.txtTableList.setText(tables_string)
+        if selected_table != 'Select a table':
+            selected_table = '10' + selected_table[-1:]
+            table_id = int(selected_table)
         
-        print(f'Current option: {dhcp_option}')
-        if dhcp_option != 'Select a table...':
-            self.txtCurrentOption.setText(dhcp_option)
+            dhcp_option = 'UNSET'
+            try:
+                # Get list of clients on network, filtering on timespan of last 14 days
+                vlans = dashboard.appliance.getNetworkApplianceVlans(network)
+            except meraki.APIError as e:
+                print(f'Meraki API error: {e}')
+                print(f'status code = {e.status}')
+                print(f'reason = {e.reason}')
+                print(f'error = {e.message}')
+            except Exception as e:
+                print(f'some other error: {e}')
+            else:
+                tables_string = ''
+                for vlan in vlans:
+                    vlan_id = vlan['id']
+                    option_value = 'UNSET'
+                    if 'dhcpOptions' in vlan:
+                        for option in vlan['dhcpOptions']:
+                            option_value = option['value']
+                            if vlan['id'] == table_id:
+                                dhcp_option = option['value']
+
+                    if vlan_id in range(101,109):
+                        tables_string += f'Table {vlan_id}: {option_value}\n\n'
+
+            self.txtTableList.setText(tables_string)
+            
+            print(f'Current option: {dhcp_option}')
+            if dhcp_option != 'Select a table...':
+                self.txtCurrentOption.setText(dhcp_option)
 
     def setTableInfo(self):
         API_KEY = creds.creds['api_key']
@@ -162,61 +164,67 @@ class Ui_MainWindow(object):
 
         network = 'L_613052499275810377'
         selected_table = self.cmbSelectTable.currentText()
-        selected_table = '10' + selected_table[-1:]
-
-        table_id = int(selected_table)
-        tables_string = ''
-
-        optionToSet = self.txtSetOption.text()
-        print(f'Setting table {table_id} with option {optionToSet}')
-
-        try:
-            # Get list of clients on network, filtering on timespan of last 14 days
-            vlans = dashboard.appliance.getNetworkApplianceVlans(network)
-        except meraki.APIError as e:
-            print(f'Meraki API error: {e}')
-            print(f'status code = {e.status}')
-            print(f'reason = {e.reason}')
-            print(f'error = {e.message}')
-        except Exception as e:
-            print(f'some other error: {e}')
+        if selected_table == 'Select a table':
+            self.txtTableList.setText('Please select a table!')
+        elif self.txtSetOption.text() == '':
+            self.txtTableList.setText('Option must not be empty!')
+            self.txtSetOption.setText('')
         else:
-            list_of_vlans = []
-            for vlan in vlans:
-                # vlan_id = vlan['id']
-                option_value = 'UNSET'
-                if 'dhcpOptions' in vlan:
-                    for option in vlan['dhcpOptions']:
-                        option_value = option['value']
-                    vlan_dict = {
-                        "table_id": vlan['id'],
-                        "table_option": option_value
-                    }
-                    list_of_vlans.append(vlan_dict)
-                if vlan['id'] == table_id:
-                    dhcp_option = []
-                    set_vlan = {
-                        "code": "66",
-                        "type": "text",
-                        "value": optionToSet
-                    }
-                    option_value = set_vlan['value']
-                    dhcp_option.append(set_vlan)
-                    print(dhcp_option)
+            selected_table = '10' + selected_table[-1:]
 
-                    dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=dhcp_option)
+            table_id = int(selected_table)
+            tables_string = ''
 
-            for vlan in list_of_vlans:
-                if vlan['table_id'] in range(101,109):
-                    table_option = vlan['table_option']
-                    vlan_id = vlan['table_id']
-                    if vlan_id == table_id:
-                        table_option = optionToSet
-                    tables_string += f'Table {vlan_id}: {table_option}\n\n'
-        
-        self.txtCurrentOption.setText(optionToSet)
-        self.txtTableList.setText(tables_string)
-        self.txtSetOption.setText('')
+            optionToSet = self.txtSetOption.text()
+            print(f'Setting table {table_id} with option {optionToSet}')
+
+            try:
+                # Get list of clients on network, filtering on timespan of last 14 days
+                vlans = dashboard.appliance.getNetworkApplianceVlans(network)
+            except meraki.APIError as e:
+                print(f'Meraki API error: {e}')
+                print(f'status code = {e.status}')
+                print(f'reason = {e.reason}')
+                print(f'error = {e.message}')
+            except Exception as e:
+                print(f'some other error: {e}')
+            else:
+                list_of_vlans = []
+                for vlan in vlans:
+                    # vlan_id = vlan['id']
+                    option_value = 'UNSET'
+                    if 'dhcpOptions' in vlan:
+                        for option in vlan['dhcpOptions']:
+                            option_value = option['value']
+                        vlan_dict = {
+                            "table_id": vlan['id'],
+                            "table_option": option_value
+                        }
+                        list_of_vlans.append(vlan_dict)
+                    if vlan['id'] == table_id:
+                        dhcp_option = []
+                        set_vlan = {
+                            "code": "66",
+                            "type": "text",
+                            "value": optionToSet
+                        }
+                        option_value = set_vlan['value']
+                        dhcp_option.append(set_vlan)
+                        print(dhcp_option)
+
+                        dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=dhcp_option)
+
+                for vlan in list_of_vlans:
+                    if vlan['table_id'] in range(101,109):
+                        table_option = vlan['table_option']
+                        vlan_id = vlan['table_id']
+                        if vlan_id == table_id:
+                            table_option = optionToSet
+                        tables_string += f'Table {vlan_id}: {table_option}\n\n'
+            
+            self.txtCurrentOption.setText(optionToSet)
+            self.txtTableList.setText(tables_string)
+            self.txtSetOption.setText('')
 
     
     def clearTableInfo(self):
@@ -230,48 +238,51 @@ class Ui_MainWindow(object):
 
         network = 'L_613052499275810377'
         selected_table = self.cmbSelectTable.currentText()
-        selected_table = '10' + selected_table[-1:]
-
-        table_id = int(selected_table)
-        tables_string = ''
-
-        try:
-            # Get list of clients on network, filtering on timespan of last 14 days
-            vlans = dashboard.appliance.getNetworkApplianceVlans(network)
-        except meraki.APIError as e:
-            print(f'Meraki API error: {e}')
-            print(f'status code = {e.status}')
-            print(f'reason = {e.reason}')
-            print(f'error = {e.message}')
-        except Exception as e:
-            print(f'some other error: {e}')
+        if selected_table == 'Select a table':
+            self.txtTableList.setText('Please select a table!')
         else:
-            list_of_vlans = []
-            for vlan in vlans:
-                # vlan_id = vlan['id']
-                option_value = 'UNSET'
-                if 'dhcpOptions' in vlan:
-                    for option in vlan['dhcpOptions']:
-                        option_value = option['value']
-                    vlan_dict = {
-                        "table_id": vlan['id'],
-                        "table_option": option_value
-                    }
-                    list_of_vlans.append(vlan_dict)
+            selected_table = '10' + selected_table[-1:]
 
-            for vlan in list_of_vlans:
-                if vlan['table_id'] in range(101,109):
-                    table_option = vlan['table_option']
-                    vlan_id = vlan['table_id']
-                    if vlan_id == table_id:
-                        table_option = 'UNSET'
-                    tables_string += f'Table {vlan_id}: {table_option}\n\n'
+            table_id = int(selected_table)
+            tables_string = ''
 
-        dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=[])
+            try:
+                # Get list of clients on network, filtering on timespan of last 14 days
+                vlans = dashboard.appliance.getNetworkApplianceVlans(network)
+            except meraki.APIError as e:
+                print(f'Meraki API error: {e}')
+                print(f'status code = {e.status}')
+                print(f'reason = {e.reason}')
+                print(f'error = {e.message}')
+            except Exception as e:
+                print(f'some other error: {e}')
+            else:
+                list_of_vlans = []
+                for vlan in vlans:
+                    # vlan_id = vlan['id']
+                    option_value = 'UNSET'
+                    if 'dhcpOptions' in vlan:
+                        for option in vlan['dhcpOptions']:
+                            option_value = option['value']
+                        vlan_dict = {
+                            "table_id": vlan['id'],
+                            "table_option": option_value
+                        }
+                        list_of_vlans.append(vlan_dict)
 
-        self.txtCurrentOption.setText('UNSET')
-        self.txtTableList.setText(tables_string)
-        self.txtSetOption.setText('')
+                for vlan in list_of_vlans:
+                    if vlan['table_id'] in range(101,109):
+                        table_option = vlan['table_option']
+                        vlan_id = vlan['table_id']
+                        if vlan_id == table_id:
+                            table_option = 'UNSET'
+                        tables_string += f'Table {vlan_id}: {table_option}\n\n'
+
+            dashboard.appliance.updateNetworkApplianceVlan(network, table_id, dhcpOptions=[])
+
+            self.txtCurrentOption.setText('UNSET')
+            self.txtTableList.setText(tables_string)
+            self.txtSetOption.setText('')
         
 
 if __name__ == "__main__":
