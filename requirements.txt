@@ -1,0 +1,5 @@
+# requirements for prov updater
+# install requirements with
+# pip(3) install -r requirements.txt
+PyQt5
+meraki >= 1.0.0b14
