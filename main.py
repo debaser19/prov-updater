@@ -100,8 +100,8 @@ class Ui_MainWindow(object):
         self.cmbSelectTable.adjustSize()
         self.txtSetOption.setPlaceholderText("Set new option...")
         self.txtTableList.setPlaceholderText("Waiting for API call...")
-        self.btnSubmit.setText(_translate("MainWindow", "Send it!"))
-        self.btnClear.setText(_translate("MainWindow", "Clear that shit"))
+        self.btnSubmit.setText(_translate("MainWindow", "Set Option"))
+        self.btnClear.setText(_translate("MainWindow", "Clear Option"))
         self.txtCurrentOption.setPlaceholderText(_translate("MainWindow", "Select a table..."))
 
     

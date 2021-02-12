@@ -5,3 +5,8 @@ creds.py
 build/
 dist/
 *.spec
+.vscode
+Include
+Lib
+Scripts
+*.cfg
